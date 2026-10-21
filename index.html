@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Habit Tracker</title>
+<style>
+:root{--bg:#eef1ee;--card:#fff;--ink:#27332f;--mute:#66756f;--line:#d5ddd8;--sage:#7d9a8c;--on:#3d544b;--onfg:#fff;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#161c1a;--card:#1e2623;--ink:#e6ece9;--mute:#97a69f;--line:#33403b;--sage:#8fb0a1;--on:#8fb0a1;--onfg:#101614;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#161c1a;--card:#1e2623;--ink:#e6ece9;--mute:#97a69f;--line:#33403b;--sage:#8fb0a1;--on:#8fb0a1;--onfg:#101614;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:980px;margin:0 auto;padding:20px 14px 40px}
+h1{font:400 clamp(32px,9vw,52px)/1.05 Georgia,"Times New Roman",serif;margin:0;letter-spacing:-.01em}
+.sub{margin:6px 0 18px;color:var(--mute)}
+.bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+#month{font:400 24px Georgia,"Times New Roman",serif}
+.bar button{width:44px;height:44px;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:50%;font-size:22px;cursor:pointer}
+.sum{display:grid;grid-template-columns:112px 1fr;gap:16px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.donut{position:relative;width:112px;height:112px}
+.donut svg{width:100%;height:100%;transform:rotate(-90deg)}
+.t{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.t b{font:400 26px Georgia,serif}
+.t span{font-size:11px;color:var(--mute)}
+#spark{width:100%;height:86px;display:block;margin-top:4px}
+.scroll{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:14px}
+table{border-collapse:separate;border-spacing:0;width:max-content;min-width:100%}
+th,td{padding:0;border-bottom:1px solid var(--line);text-align:center}
+td{padding:5px 2px;min-width:32px}
+th.name{position:sticky;left:0;z-index:2;background:var(--card);text-align:left;padding:8px 10px;width:170px;min-width:170px;max-width:170px;font-weight:500;border-right:1px solid var(--line)}
+th.wkh{background:var(--on);color:var(--onfg);font-size:12px;font-weight:500;padding:7px 0;border-left:1px solid var(--card)}
+th.name.wkh{border-left:0;font-size:13px;padding-left:10px}
+th.dh{font-size:12px;font-weight:500;color:var(--mute);padding:5px 0}
+.wk{border-left:2px solid var(--line)}
+.today{background:color-mix(in srgb,var(--sage) 20%,transparent)}
+.nm{display:flex;justify-content:space-between;align-items:center;gap:6px}
+.nm span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.del{border:0;background:none;color:var(--mute);font-size:12px;padding:6px;cursor:pointer;flex:none}
+.pb{height:4px;background:var(--line);border-radius:2px;margin:3px 0;overflow:hidden}
+.pb i{display:block;height:100%;background:var(--sage)}
+small{color:var(--mute);font-size:12px}
+.b{width:24px;height:24px;border:1.5px solid var(--sage);border-radius:5px;background:transparent;cursor:pointer;padding:0;position:relative;display:block;margin:auto}
+.b.on{background:var(--on);border-color:var(--on)}
+.b.on::after{content:"";position:absolute;left:7px;top:3px;width:6px;height:11px;border:solid var(--onfg);border-width:0 2px 2px 0;transform:rotate(45deg)}
+button:focus-visible,input:focus-visible{outline:2px solid var(--sage);outline-offset:2px}
+.add{display:flex;gap:8px;margin-top:14px}
+.add input{flex:1;min-width:0;padding:12px;font-size:16px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink)}
+.add button{background:var(--on);color:var(--onfg);border:0;border-radius:10px;padding:0 20px;font-weight:600;font-size:15px;cursor:pointer}
+.empty{padding:24px;text-align:center;color:var(--mute)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:12px}
+.stats div{min-width:0;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px}
+.stats b{display:block;font:400 21px Georgia,serif;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.goal{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--mute);margin-top:4px}
+.gs{width:26px;height:26px;border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:6px;padding:0;font-size:15px;cursor:pointer}
+.nm input{flex:1;min-width:0;font:inherit;padding:3px 6px;border:1px solid var(--sage);border-radius:6px;background:var(--bg);color:var(--ink)}
+.foot{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:14px}
+.foot button{background:none;border:1px solid var(--line);color:var(--mute);border-radius:10px;padding:10px 14px;font-size:14px;cursor:pointer;flex:none}
+</style>
+</head>
+<body>
+<main>
+<h1>Habit Tracker</h1>
+<p class="sub">Keep track of your daily and weekly habits</p>
+<div class="bar"><button id="prev" aria-label="Previous month">‹</button><div id="month"></div><button id="next" aria-label="Next month">›</button></div>
+<section class="sum">
+<div class="donut"><svg viewBox="0 0 42 42"><circle cx="21" cy="21" r="15.9155" fill="none" stroke="var(--line)" stroke-width="5"/><circle id="arc" cx="21" cy="21" r="15.9155" fill="none" stroke="var(--on)" stroke-width="5" stroke-dasharray="0 100"/></svg><div class="t"><b id="pct"></b><span id="cnt"></span></div></div>
+<div><small>Habits completed each day</small><svg id="spark" viewBox="0 0 300 90" preserveAspectRatio="none"></svg></div>
+</section>
+<section class="stats"><div><small>Perfect days</small><b id="s1">0</b></div><div><small>Longest streak</small><b id="s2">0</b></div><div><small>Top habit</small><b id="s3">None yet</b></div></section>
+<div class="scroll" id="scroll"><table id="grid"></table></div>
+<div class="add"><input id="new" placeholder="Add a habit" maxlength="40" aria-label="New habit name"><button id="addBtn">Add habit</button></div>
+<div class="foot"><small>Tap a habit name to rename it.</small><button id="reset">Clear this month</button></div>
+</main>
+<script>
+const KEY="habit-tracker-v1";
+const defaults=["Wake up on time","Exercise","Meditation","Reading","Journaling","Water intake","Healthy eating","Vitamins","Learn a new skill","No screens before bed"];
+let S=null;
+try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+if(!S||!Array.isArray(S.habits))S={habits:defaults.map((n,i)=>({id:"h"+i,name:n})),checks:{}};
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}};
+const $=id=>document.getElementById(id);
+const esc=s=>s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const now=new Date();let Y=now.getFullYear(),M=now.getMonth(),pend=null,edit=null,rp=false;
+const ym=()=>Y+"-"+(M+1);
+const dim=()=>new Date(Y,M+1,0).getDate();
+const get=h=>((S.checks[ym()]||{})[h]||[]);
+function runs(c,n,td){
+  c=c.slice().sort((a,b)=>a-b);let best=0,r=0,prev=0;
+  for(const d of c){r=d==prev+1?r+1:1;prev=d;if(r>best)best=r}
+  let cur=0;if(td){let d=c.includes(td)?td:td-1;while(d>0&&c.includes(d)){cur++;d--}}
+  return{best,cur};
+}
+function render(){
+  const n=dim(),H=S.habits,t=new Date(),td=(t.getFullYear()==Y&&t.getMonth()==M)?t.getDate():0;
+  $("month").textContent=new Date(Y,M,1).toLocaleString("en",{month:"long",year:"numeric"});
+  let done=0,gd=0,gt=0,bestRun=0,top=null;const per=Array(n).fill(0);
+  let head='<tr><th class="name wkh">Daily habits</th>';
+  for(let s=1,k=1;s<=n;s+=7,k++){const len=Math.min(7,n-s+1);head+=`<th class="wkh" colspan="${len}">${len<3?"W"+k:"Week "+k}</th>`}
+  head+='</tr><tr><th class="name"></th>';
+  for(let d=1;d<=n;d++)head+=`<th class="dh${d==td?" today":""}${d%7==1?" wk":""}">${d}</th>`;
+  head+="</tr>";
+  let rows="";
+  for(const h of H){
+    const c=get(h.id);done+=c.length;c.forEach(d=>{if(d<=n)per[d-1]++});
+    const g=Math.min(n,Math.max(1,h.goal||n)),p=Math.min(100,Math.round(c.length/g*100)),r=runs(c,n,td),st=td?r.cur:r.best;gd+=Math.min(c.length,g);gt+=g;if(r.best>bestRun)bestRun=r.best;if(c.length&&(!top||c.length>top.c))top={c:c.length,name:h.name};
+    rows+=`<tr><th class="name"><div class="nm">${edit===h.id?`<input value="${esc(h.name)}" maxlength="40" data-ren="${h.id}" aria-label="Habit name">`:`<span data-name="${h.id}">${esc(h.name)}</span>`}<button class="del" data-del="${h.id}" aria-label="Remove ${esc(h.name)}">${pend===h.id?"Remove?":"✕"}</button></div><div class="pb"><i style="width:${p}%"></i></div><small>${c.length} of ${g} days, ${p}%${st?", "+(td?"streak ":"best streak ")+st:""}</small><div class="goal">Goal <button class="gs" data-g="${h.id}" data-s="-1" aria-label="Lower goal">−</button>${g}<button class="gs" data-g="${h.id}" data-s="1" aria-label="Raise goal">+</button> days</div></th>`;
+    for(let d=1;d<=n;d++){const on=c.includes(d);rows+=`<td class="${d==td?"today":""}${d%7==1?" wk":""}"><button class="b${on?" on":""}" data-h="${h.id}" data-d="${d}" aria-pressed="${on}" aria-label="${esc(h.name)}, day ${d}"></button></td>`}
+    rows+="</tr>";
+  }
+  $("grid").innerHTML=H.length?head+rows:'<tr><td class="empty">No habits yet. Add your first one below.</td></tr>';
+  const pct=gt?Math.round(gd/gt*100):0;
+  $("pct").textContent=pct+"%";$("cnt").textContent=gd+" of "+gt;
+  $("s1").textContent=H.length?per.filter(v=>v===H.length).length:0;$("s2").textContent=bestRun+(bestRun==1?" day":" days");$("s3").textContent=top?top.name:"None yet";
+  $("reset").textContent=rp?"Tap again to clear":"Clear this month";
+  if(edit){const i=document.querySelector(".nm input");if(i){i.focus();i.select()}}
+  $("arc").setAttribute("stroke-dasharray",pct+" "+(100-pct));
+  const line=per.map((v,i)=>((n>1?i/(n-1)*300:150).toFixed(1))+","+(84-(H.length?v/H.length:0)*76).toFixed(1)).join(" ");
+  $("spark").innerHTML=`<polygon points="0,90 ${line} 300,90" fill="var(--sage)" opacity=".25"/><polyline points="${line}" fill="none" stroke="var(--sage)" stroke-width="2" vector-effect="non-scaling-stroke"/>`;
+}
+function jump(){const el=document.querySelector("th.dh.today");$("scroll").scrollLeft=el?Math.max(0,el.offsetLeft-190):0}
+$("grid").onclick=e=>{
+  const nm=e.target.closest("[data-name]");if(nm){edit=nm.dataset.name;pend=null;render();return}
+  const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.g){const h=S.habits.find(x=>x.id===b.dataset.g),g=Math.min(dim(),Math.max(1,h.goal||dim()));h.goal=Math.min(dim(),Math.max(1,g+ +b.dataset.s));save();render();return}
+  if(b.dataset.del){
+    if(pend===b.dataset.del){S.habits=S.habits.filter(h=>h.id!==pend);pend=null;save()}else pend=b.dataset.del;
+    render();return;
+  }
+  if(b.dataset.h){
+    pend=null;rp=false;const k=ym(),o=S.checks[k]=S.checks[k]||{},a=o[b.dataset.h]=o[b.dataset.h]||[],d=+b.dataset.d,i=a.indexOf(d);
+    if(i<0)a.push(d);else a.splice(i,1);
+    save();render();
+  }
+};
+$("grid").addEventListener("keydown",e=>{if(e.target.dataset.ren){if(e.key==="Enter")e.target.blur();if(e.key==="Escape"){edit=null;render()}}});
+$("grid").addEventListener("focusout",e=>{const id=e.target.dataset&&e.target.dataset.ren;if(!id||edit!==id)return;const v=e.target.value.trim(),h=S.habits.find(x=>x.id===id);if(v&&h)h.name=v;edit=null;save();render()});
+function add(){const v=$("new").value.trim();if(!v)return;S.habits.push({id:"h"+Date.now().toString(36),name:v});$("new").value="";save();render()}
+$("addBtn").onclick=add;
+$("reset").onclick=()=>{if(rp){delete S.checks[ym()];rp=false;save()}else rp=true;render()};
+$("new").onkeydown=e=>{if(e.key==="Enter")add()};
+$("prev").onclick=()=>{M--;if(M<0){M=11;Y--}pend=null;rp=false;edit=null;render();jump()};
+$("next").onclick=()=>{M++;if(M>11){M=0;Y++}pend=null;rp=false;edit=null;render();jump()};
+render();jump();
+</script>
+</body>
+</html>
